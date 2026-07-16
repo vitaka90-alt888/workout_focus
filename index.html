@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Workout Focus</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0e12">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #161820;
+            --accent-color: #ff4757;
+            --accent-hover: #ff6b81;
+            --text-main: #ffffff;
+            --text-muted: #8f9ca2;
+            --success-color: #2ed573;
+            --input-bg: #232632;
+            --btn-gradient: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%);
+            --btn-success-gradient: linear-gradient(135deg, #2ed573 0%, #7bed9f 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ЭКРАН 0: ВЫБОР ПОЛЬЗОВАТЕЛЯ */
+        .user-selector-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .user-selector-screen h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .user-btn {
+            background-color: var(--card-bg);
+            border: 2px solid #232632;
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .user-btn:active {
+            transform: scale(0.97);
+            border-color: var(--accent-color);
+        }
+
+        .user-btn .avatar {
+            font-size: 32px;
+        }
+
+        .user-btn .username {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* ЭКРАН 1: ГЛАВНОЕ МЕНЮ */
+        .main-menu-screen {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .current-user-badge {
+            background-color: #232632;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #32364a;
+        }
+
+        .change-user-link {
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: underline;
+        }
+
+        /* КНОПКА НАСТРОЕК 1ПМ */
+        .btn-settings-toggle {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid #232632;
+            padding: 14px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-settings-toggle:active {
+            background-color: #232632;
+        }
+
+        /* КНОПКИ ТРЕНИРОВОЧНЫХ ДНЕЙ */
+        .day-card {
+            background: linear-gradient(145deg, #161820, #1c1e28);
+            border: 1px solid #282b3d;
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .day-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-color);
+        }
+
+        .day-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .day-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .day-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* НАСТРОЙКИ 1ПМ */
+        .one-rep-max-settings {
+            display: none;
+            background-color: var(--card-bg);
+            border: 1px solid #232632;
+            border-radius: 20px;
+            padding: 20px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .one-rep-max-settings h2 {
+            font-size: 18px;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .opm-grid {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .opm-grid label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .opm-grid input {
+            background-color: var(--input-bg);
+            border: 1px solid #32364a;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            outline: none;
+        }
+
+        .opm-grid input:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* ЭКРАН 2: ПЛЕЕР ТРЕНИРОВКИ */
+        .workout-player {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid #232632;
+            padding: 20px;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background-color: #232632;
+            border-radius: 3px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .exercise-counter {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .gif-container {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background-color: #0d0e12;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #232632;
+        }
+
+        .gif-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gif-placeholder {
+            color: var(--text-muted);
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .exercise-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .exercise-type {
+            font-size: 11px;
+            padding: 4px 10px;
+            background-color: #232632;
+            border-radius: 20px;
+            color: var(--text-muted);
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Плашка с весом */
+        .weight-suggestion-box {
+            background-color: rgba(255, 71, 87, 0.08);
+            border: 1px dashed rgba(255, 71, 87, 0.4);
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .weight-suggestion-box span {
+            display: block;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .weight-suggestion-box small {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .set-display {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+
+        .set-target {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .timer-overlay {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .timer-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 6px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.15);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { box-shadow: 0 0 10px rgba(255, 71, 87, 0.05); }
+            to { box-shadow: 0 0 25px rgba(255, 71, 87, 0.25); }
+        }
+
+        /* Кнопки действий */
+        .main-action-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.2);
+        }
+
+        .main-action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-start-workout {
+            background: var(--btn-success-gradient);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.25);
+        }
+
+        .btn-end-set {
+            background: var(--btn-gradient);
+            color: #fff;
+        }
+
+        .btn-skip-timer {
+            background-color: #232632;
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        /* ЭКРАН 3: ТРЕНИРОВКА ЗАВЕРШЕНА */
+        .summary-screen {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid #232632;
+            padding: 40px 20px;
+            width: 100%;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .summary-screen h2 {
+            font-size: 28px;
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header id="app-header">
+        <h1>Workout Focus</h1>
+    </header>
+
+    <!-- ЭКРАН 0: ВЫБОР ПОЛЬЗОВАТЕЛЯ -->
+    <div class="user-selector-screen" id="userSelectorScreen">
+        <h2>Кто сегодня тренируется?</h2>
+        <button class="user-btn" onclick="selectUser('user1', 'Атлет 1')">
+            <span class="avatar">⚡</span>
+            <span class="username">Атлет 1</span>
+        </button>
+        <button class="user-btn" onclick="selectUser('user2', 'Атлет 2')">
+            <span class="avatar">🔥</span>
+            <span class="username">Атлет 2</span>
+        </button>
+    </div>
+
+    <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ С ТРЕНИРОВКАМИ -->
+    <div class="main-menu-screen" id="mainMenuScreen">
+        <div class="current-user-badge">
+            <span>Профиль: <strong id="currentUserLabel" style="color: var(--accent-color);">Атлет 1</strong></span>
+            <span class="change-user-link" onclick="logoutUser()">Сменить</span>
+        </div>
+
+        <!-- НАСТРОЙКИ 1ПМ -->
+        <button class="btn-settings-toggle" id="settingsToggleBtn" onclick="toggleSettings()">
+            ⚙️ Мои Одноповторные Максимумы (1ПМ)
+        </button>
+
+        <!-- БЛОК НАСТРОЕК 1ПМ -->
+        <div class="one-rep-max-settings" id="settingsArea">
+            <h2>Твои Личные 1ПМ (Рекорды)</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Введи предельный вес на 1 повторение. Приложение рассчитает рабочие веса только для твоего профиля.</p>
+            
+            <div class="opm-grid">
+                <label>Жим штанги лежа:</label>
+                <input type="number" id="opm_bench" value="100" onchange="saveOPM()">
+                
+                <label>Жим гантелей 30° (на 1 гантель):</label>
+                <input type="number" id="opm_incline" value="35" onchange="saveOPM()">
+                
+                <label>Жим штанги узким хватом:</label>
+                <input type="number" id="opm_close_grip" value="80" onchange="saveOPM()">
+
+                <label>Тяга гантели в упоре (на 1 гантель):</label>
+                <input type="number" id="opm_db_row" value="40" onchange="saveOPM()">
+
+                <label>Тяга штанги в наклоне:</label>
+                <input type="number" id="opm_barbell_row" value="90" onchange="saveOPM()">
+
+                <label>Сгибания рук с EZ-грифом:</label>
+                <input type="number" id="opm_ez_curl" value="50" onchange="saveOPM()">
+
+                <label>Жим гантелей сидя (на 1 гантель):</label>
+                <input type="number" id="opm_shoulder_press" value="30" onchange="saveOPM()">
+            </div>
+            <button class="main-action-btn btn-skip-timer" style="padding: 10px; font-size: 14px; margin-top: 10px; border-radius: 10px;" onclick="toggleSettings()">Сохранить и закрыть</button>
+        </div>
+
+        <!-- КНОПКИ ВЫБОРА ДНЯ -->
+        <div class="day-card" onclick="startSession(1)">
+            <h3>День 1: Грудь + Трицепс</h3>
+            <p>Жим лежа (75%), Жим 30° (70%), Разводка, Узкий хват (75%), Французский жим, Обратные отжимания</p>
+        </div>
+        <div class="day-card" onclick="startSession(2)">
+            <h3>День 2: Спина + Бицепс</h3>
+            <p>Подтягивания на турнике, Тяга гантели (70%), Тяга штанги (75%), Сгибания EZ (70%), Молотки</p>
+        </div>
+        <div class="day-card" onclick="startSession(3)">
+            <h3>День 3: Плечи + Предплечья</h3>
+            <p>Жим сидя (70%), Тяга к подбородку, Махи в наклоне, Сгибания/разгибания запястий, Удержание блинов</p>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: ПЛЕЕР ТРЕНИРОВКИ -->
+    <div class="workout-player" id="workoutPlayer">
+        <button class="btn-back" onclick="exitWorkout()">← Выход</button>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="exercise-counter" id="exerciseCounter">Упражнение 1 из 6</div>
+
+        <div class="gif-container">
+            <img id="exerciseGif" src="" alt="Иллюстрация упражнения" onerror="handleImageError(this)">
+            <div id="gifPlaceholder" class="gif-placeholder" style="display: none;">Анимация отсутствует</div>
+        </div>
+
+        <div class="exercise-title" id="exerciseTitle">Жим штанги лежа</div>
+        <div class="exercise-type" id="exerciseType">Базовое, расчет от 1ПМ</div>
+
+        <!-- Подсказка по весу -->
+        <div class="weight-suggestion-box" id="weightSuggestionBox">
+            <small id="weightCalcLabel">Рекомендуемый рабочий вес:</small>
+            <span id="weightValue">75 кг</span>
+        </div>
+
+        <!-- Информация о подходах во время выполнения -->
+        <div id="exerciseInfoArea">
+            <div class="set-display" id="currentSetText">Подход 1</div>
+            <div class="set-target" id="repsTargetText">8-10 повторений</div>
+        </div>
+
+        <!-- Область таймера во время отдыха -->
+        <div class="timer-overlay" id="timerArea">
+            <div class="timer-circle" id="timerValue">02:30</div>
+            <div class="set-target">Время отдыхать</div>
+        </div>
+
+        <!-- Единственная кнопка управления -->
+        <button class="main-action-btn btn-start-workout" id="mainActionButton" onclick="handleMainAction()">Старт тренировки</button>
+    </div>
+
+    <!-- ЭКРАН 3: ТРЕНИРОВКА ЗАВЕРШЕНА -->
+    <div class="summary-screen" id="summaryScreen">
+        <h2>Тренировка окончена!</h2>
+        <p>Ты отлично поработал сегодня. Все подходы выполнены, мышцы забиты!</p>
+        <button class="main-action-btn btn-start-workout" style="margin-top: 20px;" onclick="resetToMenu()">В главное меню</button>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // БАЗА ДАННЫХ ТРЕНИРОВОК И ПУТИ К ГИФКАМ
+    // ==========================================
+    // Отредактируй значения в параметре "gif" под точные названия файлов в твоей папке "images/"
+    const workouts = {
+        1: {
+            title: "Грудь + Трицепс",
+            exercises: [
+                { name: "Жим штанги лежа", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "8-10", rest: 150, gif: "images/bench_press.gif", opmKey: "opm_bench", pct: 0.75 },
+                { name: "Жим гантелей под углом 30°", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "10-12", rest: 120, gif: "images/incline_dumbbell_press.gif", opmKey: "opm_incline", pct: 0.70 },
+                { name: "Разводка гантелей на полу", type: "Вспомогательное, вес вручную", sets: 3, reps: "12", rest: 90, gif: "images/floor_flyes.gif" },
+                { name: "Жим штанги узким хватом", type: "Базовое, расчет от 1ПМ", sets: 3, reps: "8-10", rest: 120, gif: "images/close_grip_press.gif", opmKey: "opm_close_grip", pct: 0.75 },
+                { name: "Французский жим с гантелями лежа", type: "Вспомогательное, вес вручную", sets: 3, reps: "10-12", rest: 90, gif: "images/french_press_db.gif" },
+                { name: "Обратные отжимания от скамьи", type: "Вспомогательное, собственный вес", sets: 3, reps: "макс. повторений", rest: 90, gif: "images/bench_dips.gif" }
+            ]
+        },
+        2: {
+            title: "Спина + Бицепс",
+            exercises: [
+                { name: "Подтягивания на турнике", type: "Вспомогательное, собственный вес", sets: 4, reps: "5-10", rest: 120, gif: "images/pullups.gif" },
+                { name: "Тяга гантели в упоре о скамью", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "10-12", rest: 120, gif: "images/db_row.gif", opmKey: "opm_db_row", pct: 0.70 },
+                { name: "Тяга штанги в наклоне", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "8-10", rest: 120, gif: "images/underhand_barbell_row.gif", opmKey: "opm_barbell_row", pct: 0.75 },
+                { name: "Сгибание рук с EZ-грифом", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "10-12", rest: 90, gif: "images/ez_bicep_curl.gif", opmKey: "opm_ez_curl", pct: 0.70 },
+                { name: "Молотковые сгибания рук", type: "Вспомогательное, вес вручную", sets: 4, reps: "10-12", rest: 90, gif: "images/hammer_curls.gif" }
+            ]
+        },
+        3: {
+            title: "Плечи + Предплечья",
+            exercises: [
+                { name: "Жим гантелей сидя", type: "Базовое, расчет от 1ПМ", sets: 4, reps: "10-12", rest: 120, gif: "images/seated_db_press.gif", opmKey: "opm_shoulder_press", pct: 0.70 },
+                { name: "Тяга штанги к подбородку", type: "Вспомогательное, вес вручную", sets: 4, reps: "10-12", rest: 90, gif: "images/upright_row_wide.gif" },
+                { name: "Махи гантелями в наклоне", type: "Вспомогательное, вес вручную", sets: 4, reps: "12", rest: 90, gif: "images/rear_delt_flyes.gif" },
+                { name: "Сгибания запястий со штангой", type: "Вспомогательное, вес вручную", sets: 3, reps: "12-15", rest: 60, gif: "images/wrist_curls_barbell.gif" },
+                { name: "Разгибания запястий со штангой", type: "Вспомогательное, вес вручную", sets: 3, reps: "12-15", rest: 60, gif: "images/reverse_wrist_curls.gif" },
+                { name: "Удержание блинов пальцами", type: "Вспомогательное, вес вручную", sets: 3, reps: "макс. секунд", rest: 60, gif: "images/plate_pinch.gif" }
+            ]
+        }
+    };
+
+    // СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+    let currentUser = null; 
+    let currentWorkout = null;
+    let currentExIndex = 0;
+    let currentSet = 0;
+    let timerInterval = null;
+    let secondsLeft = 0;
+    let appState = "PRE_START";
+
+    // УЛУЧШЕННЫЙ ОБРАБОТЧИК ОШИБОК ИЗОБРАЖЕНИЙ
+    function handleImageError(img) {
+        console.error("Не удалось загрузить картинку по пути:", img.src);
+        img.style.display = 'none';
+        
+        // Показываем заглушку с текстом ошибки и путем для удобства отладки
+        const placeholder = document.getElementById('gifPlaceholder');
+        placeholder.style.display = 'block';
+        placeholder.innerHTML = `
+            <span style="font-size: 24px; display:block; margin-bottom:5px;">⚠️</span>
+            Анимация отсутствует<br>
+            <span style="font-size:10px; color:#ff4757; word-break:break-all;">Ожидался файл: ${img.getAttribute('src')}</span>
+        `;
+    }
+
+    // ШАГ 0: ВЫБОР ПОЛЬЗОВАТЕЛЯ
+    function selectUser(userKey, userName) {
+        currentUser = userKey;
+        document.getElementById('currentUserLabel').innerText = userName;
+        
+        document.getElementById('userSelectorScreen').style.display = 'none';
+        document.getElementById('mainMenuScreen').style.display = 'flex';
+        
+        loadOPM();
+    }
+
+    function logoutUser() {
+        currentUser = null;
+        document.getElementById('mainMenuScreen').style.display = 'none';
+        document.getElementById('userSelectorScreen').style.display = 'flex';
+    }
+
+    // ПОКАЗАТЬ / СКРЫТЬ НАСТРОЕК 1ПМ
+    function toggleSettings() {
+        const area = document.getElementById('settingsArea');
+        if (area.style.display === 'flex') {
+            area.style.display = 'none';
+        } else {
+            area.style.display = 'flex';
+        }
+    }
+
+    // СОХРАНЕНИЕ 1ПМ (в localStorage)
+    function saveOPM() {
+        if (!currentUser) return;
+        const keys = ["opm_bench", "opm_incline", "opm_close_grip", "opm_db_row", "opm_barbell_row", "opm_ez_curl", "opm_shoulder_press"];
+        keys.forEach(key => {
+            const val = document.getElementById(key).value;
+            localStorage.setItem(`${currentUser}_${key}`, val);
+        });
+    }
+
+    // ЗАГРУЗКА 1ПМ
+    function loadOPM() {
+        if (!currentUser) return;
+        const keys = ["opm_bench", "opm_incline", "opm_close_grip", "opm_db_row", "opm_barbell_row", "opm_ez_curl", "opm_shoulder_press"];
+        
+        const defaults = {
+            opm_bench: "100",
+            opm_incline: "35",
+            opm_close_grip: "80",
+            opm_db_row: "40",
+            opm_barbell_row: "90",
+            opm_ez_curl: "50",
+            opm_shoulder_press: "30"
+        };
+
+        keys.forEach(key => {
+            const savedVal = localStorage.getItem(`${currentUser}_${key}`);
+            document.getElementById(key).value = savedVal ? savedVal : defaults[key];
+        });
+    }
+
+    // РАСЧЕТ РАБОЧЕГО ВЕСА
+    function calculateTargetWeight(exercise) {
+        if (!exercise.opmKey || !currentUser) {
+            return "Вес по самочувствию";
+        }
+        
+        const opmValue = parseFloat(localStorage.getItem(`${currentUser}_${exercise.opmKey}`)) || parseFloat(document.getElementById(exercise.opmKey).value) || 0;
+        
+        if (opmValue <= 0) {
+            return "Укажи 1ПМ в настройках";
+        }
+
+        const rawWeight = opmValue * exercise.pct;
+        const roundedWeight = Math.round(rawWeight / 2.5) * 2.5;
+
+        if (exercise.opmKey === "opm_incline" || exercise.opmKey === "opm_db_row" || exercise.opmKey === "opm_shoulder_press") {
+            return `${roundedWeight} кг (на каждую)`;
+        }
+
+        return `${roundedWeight} кг`;
+    }
+
+    // ЗАПУСК ТРЕНИРОВКИ
+    function startSession(dayNumber) {
+        currentWorkout = workouts[dayNumber];
+        currentExIndex = 0;
+        currentSet = 0;
+        appState = "PRE_START";
+
+        document.getElementById('mainMenuScreen').style.display = 'none';
+        document.getElementById('app-header').style.display = 'none';
+        document.getElementById('workoutPlayer').style.display = 'flex';
+        
+        updateUI();
+    }
+
+    // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ПЛЕЕРА
+    function updateUI() {
+        const ex = currentWorkout.exercises[currentExIndex];
+        const totalEx = currentWorkout.exercises.length;
+
+        document.getElementById('exerciseCounter').innerText = `Упражнение ${currentExIndex + 1} из ${totalEx}`;
+        document.getElementById('exerciseTitle').innerText = ex.name;
+        document.getElementById('exerciseType').innerText = ex.type;
+        
+        const gifImg = document.getElementById('exerciseGif');
+        const placeholder = document.getElementById('gifPlaceholder');
+        
+        // Сбрасываем видимость перед новой загрузкой
+        placeholder.style.display = 'none';
+        gifImg.style.display = 'block';
+        
+        // Устанавливаем относительный путь к гифке
+        gifImg.src = ex.gif;
+
+        // Прогресс бар
+        const progressPercent = ((currentExIndex) / totalEx) * 100;
+        document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+        // Расчет веса
+        const weightBox = document.getElementById('weightSuggestionBox');
+        const weightValSpan = document.getElementById('weightValue');
+        const weightCalcLabel = document.getElementById('weightCalcLabel');
+
+        if (ex.opmKey) {
+            weightBox.style.display = "block";
+            weightCalcLabel.innerText = `Рабочий вес (${Math.round(ex.pct * 100)}% от 1ПМ):`;
+            weightValSpan.innerText = calculateTargetWeight(ex);
+        } else {
+            weightBox.style.display = "block";
+            weightCalcLabel.innerText = `Рекомендация по весу:`;
+            weightValSpan.innerText = ex.type.includes("собственный") ? "Работа со своим весом" : "Вес подбирается вручную";
+        }
+
+        const btn = document.getElementById('mainActionButton');
+        const infoArea = document.getElementById('exerciseInfoArea');
+        const timerArea = document.getElementById('timerArea');
+
+        if (appState === "PRE_START") {
+            infoArea.style.display = 'block';
+            timerArea.style.display = 'none';
+            document.getElementById('currentSetText').innerText = `Подход 1 из ${ex.sets}`;
+            document.getElementById('repsTargetText').innerText = `${ex.reps} повторений`;
+            
+            btn.innerText = "Начать подход 1";
+            btn.className = "main-action-btn btn-start-workout";
+        } 
+        else if (appState === "WORK") {
+            infoArea.style.display = 'block';
+            timerArea.style.display = 'none';
+            document.getElementById('currentSetText').innerText = `Подход ${currentSet} из ${ex.sets}`;
+            document.getElementById('repsTargetText').innerText = `Делай: ${ex.reps} повторов`;
+
+            btn.innerText = "Конец подхода";
+            btn.className = "main-action-btn btn-end-set";
+        } 
+        else if (appState === "REST") {
+            infoArea.style.display = 'none';
+            timerArea.style.display = 'flex';
+
+            btn.innerText = "Пропустить отдых";
+            btn.className = "main-action-btn btn-skip-timer";
+        }
+    }
+
+    function handleMainAction() {
+        const ex = currentWorkout.exercises[currentExIndex];
+
+        if (appState === "PRE_START") {
+            currentSet = 1;
+            appState = "WORK";
+            updateUI();
+        } 
+        else if (appState === "WORK") {
+            clearInterval(timerInterval);
+            
+            if (currentSet >= ex.sets && currentExIndex >= currentWorkout.exercises.length - 1) {
+                finishWorkout();
+                return;
+            }
+
+            appState = "REST";
+            secondsLeft = ex.rest;
+            startTimer();
+            updateUI();
+        } 
+        else if (appState === "REST") {
+            clearInterval(timerInterval);
+            moveToNextStep();
+        }
+    }
+
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft <= 0) {
+                clearInterval(timerInterval);
+                vibrateAndSound();
+                moveToNextStep();
+            } else {
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(secondsLeft / 60);
+        const secs = secondsLeft % 60;
+        document.getElementById('timerValue').innerText = 
+            `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function moveToNextStep() {
+        const ex = currentWorkout.exercises[currentExIndex];
+        
+        if (currentSet < ex.sets) {
+            currentSet++;
+            appState = "WORK";
+        } else {
+            currentExIndex++;
+            currentSet = 1;
+            appState = "PRE_START";
+        }
+        updateUI();
+    }
+
+    function vibrateAndSound() {
+        if ('vibrate' in navigator) {
+            navigator.vibrate([200, 100, 200]);
+        }
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {
+            console.log("Аудиосистемы телефона спят.");
+        }
+    }
+
+    function finishWorkout() {
+        clearInterval(timerInterval);
+        document.getElementById('workoutPlayer').style.display = 'none';
+        document.getElementById('summaryScreen').style.display = 'flex';
+    }
+
+    function exitWorkout() {
+        if (confirm("Ты действительно хочешь закончить тренировку раньше времени?")) {
+            resetToMenu();
+        }
+    }
+
+    function resetToMenu() {
+        clearInterval(timerInterval);
+        document.getElementById('workoutPlayer').style.display = 'none';
+        document.getElementById('summaryScreen').style.display = 'none';
+        document.getElementById('mainMenuScreen').style.display = 'flex';
+        document.getElementById('app-header').style.display = 'block';
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Служебные файлы активны!', reg))
+                .catch(err => console.log('Ошибка при загрузке офлайна:', err));
+        });
+    }
+</script>
+</body>
+</html>
